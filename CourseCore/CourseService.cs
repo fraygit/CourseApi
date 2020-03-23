@@ -19,6 +19,7 @@ namespace CourseCore
             this._courseRepository = _courseRepository;
         }
 
+        // assumption: the list is a separate end point
         public async Task<IEnumerable<Course>> ListRecentlyAdded()
         {
             var recentAddedCourses = await _courseRepository.GetRecentlyAdded();
@@ -39,6 +40,7 @@ namespace CourseCore
                     {
                         var courseCode = string.Format("{0}{1}", Regex.Replace(request.Title, @"\s+", "").ToUpper().Trim(), DateTime.UtcNow.ToString("yyyyMMdd"));
 
+                        // I assume that it is not allowed to have an existing coursecode
                         var checkExistingCourseCode = await _courseRepository.GetByCourseCode(courseCode);
                         if (checkExistingCourseCode == null)
                         {
@@ -52,6 +54,7 @@ namespace CourseCore
                             };
 
                             await _courseRepository.CreateSync(newCourse);
+                            // assumption: returns the course code and the list is on a different end point
                             return new ResponseAddCourse
                             {
                                 ResponseCode = 0,
